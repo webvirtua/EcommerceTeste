@@ -21,26 +21,25 @@ $app->run(); //tudo carregado? roda o código
 */?>
 
 
-<?php //funcionando
-use DB\Sql;
-use Hcode\Page; //namespaces
-use \Slim\Slim; //namespaces está escolhendo as classes
-
+<?php
 require_once ("vendor/autoload.php");
+
+use \Slim\Slim; //namespaces está escolhendo as classes
+use \Hcode\Page; //tem que ser declarado o namespace no inicio da página que esta a classe no caso é namespace Page no arquivo Page;
 
 $app = new Slim();
 
 $app->config('debug', true);
 
-$app->get('/', function(){
-    $sql = new Sql();
+$app->get('/', function(){ //aqui mostra qual rota estou chamando
+    $page = new Page();
     
-    $results = $sql->select("SELECT * FROM tb_users");
+    $page->setTpl("index");
     
-    echo json_encode($results);
+    //aqui já chama o método destruct limpando a meméria como footer
 });
 
-$app->run();
+$app->run(); //tudo carregado? roda o código
 ?>
 
 

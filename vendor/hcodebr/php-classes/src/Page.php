@@ -16,12 +16,12 @@ class Page{
         
         // configuração do template
         $config = array(
-            "tpl_dir"       => $_SERVER["DOCUMENT_ROOT"]."/views/", //$_SERVER["DOCUMENT_ROOT"] vai trazer onde esta a pasta o diretório root
-            "cache_dir"    => $_SERVER["DOCUMENT_ROOT"]."/views-cache/",
-            "debug"         => true // set to false to improve the speed
+            "tpl_dir"   => $_SERVER["DOCUMENT_ROOT"]."/views/", //$_SERVER["DOCUMENT_ROOT"] vai trazer onde esta a pasta o diretório root
+            "cache_dir" => $_SERVER["DOCUMENT_ROOT"]."/views-cache/",
+            "debug"     => true // set to false to improve the speed
         );
         
-        Tpl::configure( $config );
+        Tpl::configure($config);
         
         $this->tpl = new Tpl();
         

@@ -1,6 +1,6 @@
 <?php 
-
-namespace DB; //o certo era assim mas não funciona
+//o certo era assim mas não funciona
+namespace DB;
 
 class Sql {
 

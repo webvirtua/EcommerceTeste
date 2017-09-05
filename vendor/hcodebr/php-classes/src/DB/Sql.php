@@ -1,12 +1,12 @@
 <?php 
-//o certo era assim mas não funciona
-namespace DB;
+
+namespace Hcode\DB;
 
 class Sql {
 
 	const HOSTNAME = "localhost";
 	const USERNAME = "root";
-	const PASSWORD = "small2009";
+	const PASSWORD = "";
 	const DBNAME = "db_ecommerce";
 
 	private $conn;

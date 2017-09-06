@@ -138,7 +138,33 @@ $app->post('/admin/users/:iduser', function($iduser){
     exit();
 });
 
-$app->run(); //tudo carregado? roda o cÃ³digo
+//rotas esqueceu a senha e redefinição
+$app->get("/admin/forgot", function(){
+    $page = new PageAdmin([ //para desabilitar o header e o footer
+        "header"=>false,
+        "footer"=>false
+    ]);
+    
+    $page->setTpl("forgot");
+});
+
+$app->post("/admin/forgot", function(){
+    $user = User::getForgot($_POST["email"]);
+    
+    header("Location: /admin/forgot/sent");
+    exit;
+});
+
+$app->get("/admin/forgot/sent", function(){
+    $page = new PageAdmin([ //para desabilitar o header e o footer
+        "header"=>false,
+        "footer"=>false
+    ]);
+    
+    $page->setTpl("forgot-sent");
+});
+
+$app->run(); //tudo carregado? roda o código
 ?>
 
 

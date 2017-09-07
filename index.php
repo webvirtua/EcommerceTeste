@@ -260,7 +260,7 @@ $app->get("/admin/categories/:idcategory", function($idcategory){
     
     $category = new Category();
     
-    $category->get($idcategory);
+    $category->get((int)$idcategory);
     
     $page = new PageAdmin();
     
@@ -274,9 +274,7 @@ $app->post("/admin/categories/:idcategory", function($idcategory){
     
     $category = new Category();
     
-    $category->get($idcategory);
-    
-    $page = new PageAdmin();
+    $category->get((int)$idcategory);
     
     $category->setData($_POST);
     
@@ -284,6 +282,19 @@ $app->post("/admin/categories/:idcategory", function($idcategory){
     
     header("Location: /admin/categories"); //redireciona
     exit();
+});
+
+$app->get("/categories/:idcategory", function($idcategory){
+    $category = new Category();
+    
+    $category->get((int)$idcategory);
+    
+    $page = new Page();
+    
+    $page->setTpl("category", [
+        'category'=>$category->getValues(),
+        'products'=>[]
+    ]);
 });
 
 $app->run(); //tudo carregado? roda o código

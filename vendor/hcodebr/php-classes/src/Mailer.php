@@ -1,5 +1,5 @@
 <?php
-namespace Hcodebr;
+namespace Hcode;
 
 use Rain\Tpl;
 //Import the PHPMailer class into the global namespace
@@ -16,14 +16,14 @@ class Mailer{
     public function __construct($toAddress, $toName, $subject, $tplName, $data = array()){ 
         // configuração do template do email
         $config = array(
-            "tpl_dir"   => $_SERVER["DOCUMENT_ROOT"]."/views/email", //$_SERVER["DOCUMENT_ROOT"] vai trazer onde esta a pasta o diretório root
+            "tpl_dir"   => $_SERVER["DOCUMENT_ROOT"]."/views/email/", //$_SERVER["DOCUMENT_ROOT"] vai trazer onde esta a pasta o diretório root
             "cache_dir" => $_SERVER["DOCUMENT_ROOT"]."/views-cache/",
             "debug"     => true // set to false to improve the speed
         );
         
         Tpl::configure($config);
         
-        $this = new Tpl();
+        $tpl = new Tpl();
         
         foreach($data as $key => $value){
             $tpl->assign($key, $value);
@@ -76,3 +76,4 @@ class Mailer{
     }
 }
 
+?>

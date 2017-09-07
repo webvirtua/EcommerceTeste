@@ -3,7 +3,7 @@ namespace Hcode\Model;
 
 use \Hcode\DB\Sql;
 use \Hcode\Model;
-use \Hcodebr\Mailer;
+use \Hcode\Mailer;
 
 class User extends Model{
 	const SESSION = "User"; //criada sessÃ£o com nome User
@@ -111,7 +111,7 @@ class User extends Model{
 		));
 	}
 	
-	public static function getForgot(){    
+	public static function getForgot($email){    
 	    $sql = new Sql();
 	    
 	    $results = $sql->select("SELECT * FROM tb_persons a INNER JOIN tb_users b USING(idperson) WHERE a.desemail = :email;", array(
@@ -149,6 +149,47 @@ class User extends Model{
 	            return $data;
 	        }
 	    }
+	}
+	//validação do código do email quando clica no link
+	public static function validForgotDecrypt($code){
+	    $idrecovery = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, User::SECRET, base64_decode($code), MCRYPT_MODE_ECB);
+	    
+	    $sql = new Sql();
+	    
+	    $results = $sql->select("
+            SELECT * FROM tb_userspasswordsrecoveries a 
+            INNER JOIN tb_users b USING(iduser)
+            INNER JOIN tb_persons c USING(idperson)
+            WHERE 
+            	a.idrecovery = :idrecovery 
+                AND a.dtrecovery IS NULL
+                AND DATE_ADD(a.dtregister, INTERVAL 5 HOUR) >= NOW();
+	    ", array(
+	        ":idrecovery"=>$idrecovery
+	    ));
+	    
+	    if(count($results) === 0){
+	        throw new \Exception("Não foi possível recuperar a senha");
+	    }else{
+	        return $results[0];
+	    }
+	}
+	//método vai verificar se a recuperação de senha foi usada e não deixar usar de novo se já foi
+	public static function setForgotUsed($idrecovery){
+        $sql = new Sql();
+        
+        $sql->query("UPDATE tb_userspasswordsrecoveries SET dtrecovery = NOW() WHERE idrecovery = :idrecovery", array(
+            ":idrecovery"=>$idrecovery
+        ));
+	}
+	
+	public function setPassword($password){
+	    $sql = new Sql();
+	    
+	    $sql->query("UPDATE tb_users SET despassword = :password WHERE iduser = :iduser", array(
+	        ":password"=>$password,
+	        ":iduser"=>$this->getiduser()
+	    ));
 	}
 }
 ?>

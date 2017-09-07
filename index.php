@@ -32,7 +32,7 @@ $app->get('/admin/login', function(){ //rota para o login
     $page = new PageAdmin([ //para desabilitar o header e o footer
 		"header"=>false,
 		"footer"=>false
-	]); 
+	]);
     
     $page->setTpl("login");
 });
@@ -162,6 +162,50 @@ $app->get("/admin/forgot/sent", function(){
     ]);
     
     $page->setTpl("forgot-sent");
+});
+
+$app->get("/admin/forgot/reset", function(){
+    //verificando o código do email enviado pra recuperação de senha
+    $user = User::validForgotDecrypt($_GET["code"]);
+    
+    //rota
+    $page = new PageAdmin([ //para desabilitar o header e o footer
+        "header"=>false,
+        "footer"=>false
+    ]);
+    
+    $page->setTpl("forgot-reset", array(
+        "name"=>$user["desperson"],
+        "code"=>$_GET["code"]
+    ));
+});
+
+$app->post("/admin/forgot/reset", function(){
+    //verificando o código do email enviado pra recuperação de senha
+    $forgot = User::validForgotDecrypt($_POST["code"]);
+    
+    //vai falar se esse processo de recuperação já foi usado e pra não recuperar de novo
+    User::setForgotUsed($forgot["idrecovery"]);
+    
+    //agora vai realmente mudar a senha
+    $user = new User();
+    
+    $user->get((int)$forgot["iduser"]);
+    
+    //criptografando a senha http://php.net/manual/pt_BR/function.password-hash.php
+    $password = password_hash($_POST["password"], PASSWORD_DEFAULT, [
+        "cost"=>8 //quantidade de processamento pra gerar a senha padrão é 12
+    ]);
+    
+    $user->setPassword($password); //vai salvar o hash dessa senha no banco
+    
+    //rota
+    $page = new PageAdmin([ //para desabilitar o header e o footer
+        "header"=>false,
+        "footer"=>false
+    ]);
+    
+    $page->setTpl("forgot-reset-success");
 });
 
 $app->run(); //tudo carregado? roda o código

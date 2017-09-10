@@ -1,8 +1,8 @@
 <?php
-//use \Hcode\Page; //tem que ser declarado o namespace no inicio da página que esta a classe no caso é namespace Page no arquivo Page;
 use \Hcode\PageAdmin;
 use \Hcode\Model\User;
 use \Hcode\Model\Category;
+use \Hcode\Model\Product;
 
 //rotas referêntes as categorias
 
@@ -80,17 +80,54 @@ $app->post("/admin/categories/:idcategory", function($idcategory){
     header("Location: /admin/categories"); //redireciona
     exit();
 });
-        
-$app->get("/categories/:idcategory", function($idcategory){
+
+$app->get("/admin/categories/:idcategory/products", function($idcategory){
+    User::verifyLogin();
+    
     $category = new Category();
     
     $category->get((int)$idcategory);
     
-    $page = new Page();
+    $page = new PageAdmin();
     
-    $page->setTpl("category", [
+    $page->setTpl("categories-products", [
         'category'=>$category->getValues(),
-        'products'=>[]
+        'productsRelated'=>$category->getProducts(),
+        'productsNotRelated'=>$category->getProducts(false)
     ]);
+});
+
+$app->get("/admin/categories/:idcategory/products/:idproduct/add", function($idcategory, $idproduct){
+    User::verifyLogin();
+    
+    $category = new Category();
+    
+    $category->get((int)$idcategory);
+    
+    $product = new Product();
+    
+    $product->get((int)$idproduct);
+    
+    $category->addProduct($product);
+    
+    header("Location: /admin/categories/".$idcategory."/products");
+    exit();
+});
+
+$app->get("/admin/categories/:idcategory/products/:idproduct/remove", function($idcategory, $idproduct){
+    User::verifyLogin();
+    
+    $category = new Category();
+    
+    $category->get((int)$idcategory);
+    
+    $product = new Product();
+    
+    $product->get((int)$idproduct);
+    
+    $category->removeProduct($product);
+    
+    header("Location: /admin/categories/".$idcategory."/products");
+    exit();
 });
 ?>

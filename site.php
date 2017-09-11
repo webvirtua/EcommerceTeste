@@ -2,6 +2,7 @@
 use \Hcode\Page; //tem que ser declarado o namespace no inicio da página que esta a classe no caso é namespace Page no arquivo Page;
 use \Hcode\Model\Product;
 use \Hcode\Model\Category;
+use Hcode\Model\Cart;
 
 //rotas referêntes ao site aberto
 
@@ -55,5 +56,14 @@ $app->get("/products/:desurl", function($desurl){
         'product'=>$product->getValues(),
         'categories'=>$product->getCategories()
     ]);
+});
+
+$app->get("/cart", function(){
+    $cart = Cart::getFromSession();
+    
+    $page = new Page();
+    
+    $page->setTpl("cart");
+    
 });
 ?>

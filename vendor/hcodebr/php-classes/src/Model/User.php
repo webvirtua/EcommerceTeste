@@ -8,6 +8,36 @@ use \Hcode\Mailer;
 class User extends Model{
 	const SESSION = "User"; //criada sessão com nome User
 	const SECRET = "HcodePhp7_Secret"; //chave para descriptografar as senhas
+	
+	public static function getFromSession(){
+	    $user = new User();
+	    
+	    if(isset($_SESSION[User::SESSION]) && (int)$_SESSION[User::SESSION]['iduser'] > 0){
+	        $user->setData($_SESSION[User::SESSION]);
+	    }
+	    
+	    return $user;
+	}
+	
+	public static function checkLogin($inadmin = true){
+	    if(
+	        !isset($_SESSION[User::SESSION])
+	        || !$_SESSION[User::SESSION]
+	        || !(int)$_SESSION[User::SESSION]["iduser"] > 0
+	    )
+	    {
+	        return false; //n�o esta logado
+	    }else{
+	        //chegando rota da administra��o
+	        if($inadmin === true && (bool)$_SESSION[User::SESSION]['inadmin'] === true){
+	            return true;
+	        }else if($inadmin ===  false){
+	            return true;
+	        }else{
+	            return false;
+	        }
+	    }
+	}
 
 	public static function login($login, $password){
 		$sql = new Sql();
@@ -39,13 +69,7 @@ class User extends Model{
 
 	//método que verifica se o usuário está logado ou não
 	public static function verifyLogin($inadmin = true){
-		if(
-			!isset($_SESSION[User::SESSION]) 
-			|| !$_SESSION[User::SESSION] 
-			|| !(int)$_SESSION[User::SESSION]["iduser"] > 0 
-			|| (bool)$_SESSION[User::SESSION]["inadmin"] !== $inadmin
-		  )
-		{ //se a sessão não for definida
+		if(User::checkLogin($inadmin)){ //se a sessão não for definida
 			header("Location: /admin/login");
 			exit();
 		}

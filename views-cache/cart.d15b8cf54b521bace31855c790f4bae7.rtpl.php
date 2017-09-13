@@ -31,43 +31,44 @@
                                         <th class="product-remove">&nbsp;</th>
                                         <th class="product-thumbnail">&nbsp;</th>
                                         <th class="product-name">Produto</th>
-                                        <th class="product-price">Preço</th>
+                                        <th class="product-price">PreÃ§o</th>
                                         <th class="product-quantity">Quantidade</th>
                                         <th class="product-subtotal">Total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    
+                                    {loop"$products"}
                                     <tr class="cart_item">
                                         <td class="product-remove">
-                                            <a title="Remove this item" class="remove" href="#">×</a> 
+                                            <a title="Remove this item" class="remove" href="/cart/<?php echo htmlspecialchars( $value["idproduct"], ENT_COMPAT, 'UTF-8', FALSE ); ?>/remove">Ã—</a> 
                                         </td>
 
                                         <td class="product-thumbnail">
-                                            <a href="#"><img width="145" height="145" alt="poster_1_up" class="shop_thumbnail" src="/res/site/img/product-thumb-2.jpg"></a>
+                                            <a href="/products/<?php echo htmlspecialchars( $value["desurl"], ENT_COMPAT, 'UTF-8', FALSE ); ?>"><img width="145" height="145" alt="poster_1_up" class="shop_thumbnail" src="<?php echo htmlspecialchars( $value["desphoto"], ENT_COMPAT, 'UTF-8', FALSE ); ?>"></a>
                                         </td>
 
                                         <td class="product-name">
-                                            <a href="#">Ship Your Idea</a> 
+                                            <a href="/product/<?php echo htmlspecialchars( $value["desurl"], ENT_COMPAT, 'UTF-8', FALSE ); ?>"><?php echo htmlspecialchars( $value["desproduct"], ENT_COMPAT, 'UTF-8', FALSE ); ?></a> 
                                         </td>
 
                                         <td class="product-price">
-                                            <span class="amount">$700.00</span> 
+                                            <span class="amount">R$ <?php echo formatPrice($value["vlprice"]); ?></span> 
                                         </td>
 
                                         <td class="product-quantity">
                                             <div class="quantity buttons_added">
-                                                <input type="button" class="minus" value="-" onclick="window.location.href = '#'">
-                                                <input type="number" size="4" class="input-text qty text" title="Qty" value="1" min="0" step="1">
-                                                <input type="button" class="plus" value="+" onclick="window.location.href = '#'">
+                                                <input type="button" class="minus" value="-" onclick="window.location.href = '/cart/<?php echo htmlspecialchars( $value["idproduct"], ENT_COMPAT, 'UTF-8', FALSE ); ?>/minus'">
+                                                <input type="number" size="4" class="input-text qty text" title="Qty" value="<?php echo htmlspecialchars( $value["nrqtd"], ENT_COMPAT, 'UTF-8', FALSE ); ?>" min="0" step="1">
+                                                <input type="button" class="plus" value="+" onclick="window.location.href = '/cart/<?php echo htmlspecialchars( $value["idproduct"], ENT_COMPAT, 'UTF-8', FALSE ); ?>/add'">
                                             </div>
                                         </td>
 
                                         <td class="product-subtotal">
-                                            <span class="amount">$700.00</span> 
+                                            <span class="amount">R$ <?php echo formatPrice($value["vltotal"]); ?></span> 
                                         </td>
                                     </tr>
-                                    
+                                    <?php } ?>
+
                                 </tbody>
                             </table>
 
@@ -75,12 +76,12 @@
 
                                 <div class="cross-sells">
 
-                                    <h2>Cálculo de Frete</h2>
+                                    <h2>CÃ¡lculo de Frete</h2>
                                     
                                     <div class="coupon">
                                         <label for="cep">CEP:</label>
                                         <input type="text" placeholder="00000-000" value="" id="cep" class="input-text" name="zipcode">
-                                        <input type="submit" formmethod="post" formaction="/cart/freight" value="CÁLCULAR" class="button">
+                                        <input type="submit" formmethod="post" formaction="/cart/freight" value="CÃ�LCULAR" class="button">
                                     </div>
 
                                 </div>

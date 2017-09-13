@@ -69,7 +69,7 @@ class User extends Model{
 
 	//método que verifica se o usuário está logado ou não
 	public static function verifyLogin($inadmin = true){
-		if(User::checkLogin($inadmin)){ //se a sessão não for definida
+		if(!User::checkLogin($inadmin)){ //se a sessão não for definida
 			header("Location: /admin/login");
 			exit();
 		}

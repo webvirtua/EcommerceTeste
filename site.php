@@ -1,10 +1,10 @@
 <?php
-use \Hcode\Page; //tem que ser declarado o namespace no inicio da página que esta a classe no caso é namespace Page no arquivo Page;
+use \Hcode\Page; //tem que ser declarado o namespace no inicio da pï¿½gina que esta a classe no caso ï¿½ namespace Page no arquivo Page;
 use \Hcode\Model\Product;
 use \Hcode\Model\Category;
 use Hcode\Model\Cart;
 
-//rotas referêntes ao site aberto
+//rotas referï¿½ntes ao site aberto
 
 $app->get('/', function(){ //aqui mostra qual rota estou chamando
     $products = Product::listAll();
@@ -15,7 +15,7 @@ $app->get('/', function(){ //aqui mostra qual rota estou chamando
         'products'=>Product::checkList($products)
     ]);
     
-    //aqui já chama o método destruct limpando a memória como footer
+    //aqui jï¿½ chama o mï¿½todo destruct limpando a memï¿½ria como footer
 });
 
 $app->get("/categories/:idcategory", function($idcategory){
@@ -62,10 +62,11 @@ $app->get("/cart", function(){
     $cart = Cart::getFromSession();
     
     $page = new Page();
-    
+
     $page->setTpl("cart", [
         'cart'=>$cart->getValues(),
-        'products'=>$cart->getProducts()
+        'products'=>$cart->getProducts(),
+        'error'=>Cart::getMsgError()
     ]);
     
 });
@@ -110,5 +111,13 @@ $app->get("/cart/:idproduct/remove", function($idproduct){
     
     header("Location: /cart");
     exit();
+});
+
+$app->post("/cart/freight", function(){
+   $cart = Cart::getFromSession();
+
+   $cart->setFreight($_POST['zipcode']);
+
+   header("Location: /cart");
 });
 ?>

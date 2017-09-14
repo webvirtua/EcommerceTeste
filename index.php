@@ -2,7 +2,7 @@
 session_start();
 require_once("vendor/autoload.php");
 
-use \Slim\Slim; //namespaces está escolhendo as classes 
+use \Slim\Slim; //namespaces estï¿½ escolhendo as classes 
 
 $app = new Slim();
 
@@ -15,7 +15,7 @@ require_once ("admin-users.php");
 require_once ("admin-categories.php");
 require_once ("admin-products.php");
 
-$app->run(); //tudo carregado? roda o código
+$app->run(); //tudo carregado? roda o cï¿½digo
 ?>
 
 

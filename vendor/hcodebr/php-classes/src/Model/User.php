@@ -259,7 +259,7 @@ class User extends Model{
 	public static function clearErrorRegister(){
 	    $_SESSION[User::ERROR_REGISTER] = NULL;
 	}
-	
+	//verifica se o usuário já existe
 	public static function checkLoginExist($login){
 	    $sql = new Sql();
 	    

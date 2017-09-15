@@ -147,7 +147,7 @@ class User extends Model{
 		));
 	}
 	
-	public static function getForgot($email){    
+	public static function getForgot($email, $inadmin = true){    
 	    $sql = new Sql();
 	    
 	    $results = $sql->select("SELECT * FROM tb_persons a INNER JOIN tb_users b USING(idperson) WHERE a.desemail = :email;", array(
@@ -172,8 +172,13 @@ class User extends Model{
 	            //encriptando
 	            $code = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, User::SECRET, $dataRecovery["idrecovery"], MCRYPT_MODE_ECB));
 	            
-	            //link, endereço que vai ser enviado o codigo e link do email
-	            $link = "http://www.hcodecommerce.com.br/admin/forgot/reset?code=$code";
+	            if($inadmin === true){
+	                //link, endereço que vai ser enviado o codigo e link do email parte administração
+	                $link = "http://www.hcodecommerce.com.br/admin/forgot/reset?code=$code";
+	            }else{
+	                //link, endereço que vai ser enviado o codigo e link do email parte dos clientes do site
+	                $link = "http://www.hcodecommerce.com.br/forgot/reset?code=$code";
+	            }
 	            
 	            $mailer = new Mailer($data["desemail"], $data["desperson"], "Redefinir Senha Hcode", "forgot", array(
 	                "name"=>$data["desperson"],

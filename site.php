@@ -219,4 +219,61 @@ $app->post("/register", function(){
     header("Location: /checkout");
     exit();
 });
+//rotas esqueceu a senha e redefinição ============================
+$app->get("/forgot", function(){
+    $page = new Page();
+    
+    $page->setTpl("forgot");
+});
+    
+$app->post("/forgot", function(){
+    $user = User::getForgot($_POST["email"], false);
+    
+    header("Location: /forgot/sent");
+    exit();
+});
+    
+$app->get("/forgot/sent", function(){
+    $page = new Page();
+    
+    $page->setTpl("forgot-sent");
+});
+    
+$app->get("/forgot/reset", function(){
+    //verificando o código do email enviado pra recuperação de senha
+    $user = User::validForgotDecrypt($_GET["code"]);
+    
+    //rota
+    $page = new Page();
+    
+    $page->setTpl("forgot-reset", array(
+        "name"=>$user["desperson"],
+        "code"=>$_GET["code"]
+    ));
+});
+    
+$app->post("/forgot/reset", function(){
+    //verificando o código do email enviado pra recuperação de senha
+    $forgot = User::validForgotDecrypt($_POST["code"]);
+    
+    //vai falar se esse processo de recuperação já foi usado e pra não recuperar de novo
+    User::setForgotUsed($forgot["idrecovery"]);
+    
+    //agora vai realmente mudar a senha
+    $user = new User();
+    
+    $user->get((int)$forgot["iduser"]);
+    
+    //criptografando a senha http://php.net/manual/pt_BR/function.password-hash.php
+    $password = password_hash($_POST["password"], PASSWORD_DEFAULT, [
+        "cost"=>8 //quantidade de processamento pra gerar a senha padrão é 12
+    ]);
+    
+    $user->setPassword($password); //vai salvar o hash dessa senha no banco
+    
+    //rota
+    $page = new Page();
+    
+    $page->setTpl("forgot-reset-success");
+});
 ?>

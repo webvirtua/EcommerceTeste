@@ -125,19 +125,97 @@ $app->post("/cart/freight", function(){
 });
 
 $app->get("/checkout", function(){
-    //verifica se o usuário está logado
+    //verifica se o usuï¿½rio estï¿½ logado
     User::verifyLogin(false);
     
+    $address = new Address();
+
     $cart = Cart::getFromSession();
     
-    $address = new Address();
+    if(isset($_GET['zipcode'])){
+        $_GET['zipcode'] = $cart->getdeszipcode();
+    }
     
+    if(isset($_GET['zipcode'])){
+        $address->loadFromCEP($_GET['zipcode']);
+        
+        $cart->setdeszipcode($_GET['zipcode']);
+        
+        $cart->save();
+        
+        $cart->getCalculateTotal();
+    }
+    
+    if(!$address->getdesaddress()) $address->setdesaddress('');
+    if(!$address->getdescomplement()) $address->setdescomplement('');
+    if(!$address->getdesdistrict()) $address->setdesdistrict('');
+    if(!$address->getdescity()) $address->setdescity('');
+    if(!$address->getdesstate()) $address->setdesstate('');
+    if(!$address->getdescountry()) $address->setdescountry('');
+    if(!$address->getdeszipcode()) $address->setdeszipcode('');
+
     $page = new Page();
     
     $page->setTpl("checkout", [
         'cart'=>$cart->getValues(),
-        'address'=>$address->getValues()
+        'address'=>$address->getValues(),
+        'products'=>$cart->getProducts(),
+        'error'=>Address::getMsgError()
     ]);
+});
+
+$app->post("/checkout", function(){
+    User::verifyLogin(false);
+
+    if(!isset($_POST['zipcode']) || $_POST['zipcode'] === ''){
+        Address::setMsgError("Informe o CEP.");
+        header("Location: /checkout");
+        exit();
+    }
+
+    if(!isset($_POST['desaddress']) || $_POST['desaddress'] === ''){
+        Address::setMsgError("Informe o endereï¿½o.");
+        header("Location: /checkout");
+        exit();
+    }
+
+    if(!isset($_POST['desdistrict']) || $_POST['desdistrict'] === ''){
+        Address::setMsgError("Informe o bairro.");
+        header("Location: /checkout");
+        exit();
+    }
+
+    if(!isset($_POST['descity']) || $_POST['descity'] === ''){
+        Address::setMsgError("Informe a cidade.");
+        header("Location: /checkout");
+        exit();
+    }
+
+    if(!isset($_POST['desstate']) || $_POST['desstate'] === ''){
+        Address::setMsgError("Informe o estado.");
+        header("Location: /checkout");
+        exit();
+    }
+
+    if(!isset($_POST['descountry']) || $_POST['descountry'] === ''){
+        Address::setMsgError("Informe o Paï¿½s.");
+        header("Location: /checkout");
+        exit();
+    }
+
+    $user = User::getFromSession();
+
+    $address = new Address();
+
+    $_POST['deszipcode'] = $_POST['zipcode']; //zipcode ï¿½ o nome do campo na arquivo checkout.html
+    $_POST['idperson'] = $user->getidperson;
+
+    $address->setData($_POST);
+
+    $address->save();
+
+    header("Location: /order");
+    exit();
 });
 
 $app->get("/login", function(){
@@ -154,7 +232,7 @@ $app->post("/login", function(){
     try{
         User::login($_POST['login'], $_POST['password']);
     }catch (Exception $e){
-        User::setError($e->getMessage());
+        User::setError(utf8_encode($e->getMessage()));
     }
     
     header("Location: /checkout");
@@ -169,10 +247,10 @@ $app->get("/logout", function(){
 });
 
 $app->post("/register", function(){
-    //não deixa apagar os dados quando erra ao criar usuário
+    //nï¿½o deixa apagar os dados quando erra ao criar usuï¿½rio
     $_SESSION['registerValues'] = $_POST;
     
-    //validação
+    //validaï¿½ï¿½o
     if(!isset($_POST['name']) || $_POST['name'] == ''){
         User::setErrorRegister("Preencha seu nome!");
         
@@ -195,7 +273,7 @@ $app->post("/register", function(){
     }
     
     if(User::checkLoginExist($_POST['email']) === true){
-        User::setErrorRegister("E-mail já está sendo usado por outro usuário!");
+        User::setErrorRegister("E-mail jï¿½ estï¿½ sendo usado por outro usuï¿½rio!");
         
         header("Location: /login");
         exit();
@@ -219,7 +297,7 @@ $app->post("/register", function(){
     header("Location: /checkout");
     exit();
 });
-//rotas esqueceu a senha e redefinição ============================
+//rotas esqueceu a senha e redefiniï¿½ï¿½o ============================
 $app->get("/forgot", function(){
     $page = new Page();
     
@@ -240,7 +318,7 @@ $app->get("/forgot/sent", function(){
 });
     
 $app->get("/forgot/reset", function(){
-    //verificando o código do email enviado pra recuperação de senha
+    //verificando o cï¿½digo do email enviado pra recuperaï¿½ï¿½o de senha
     $user = User::validForgotDecrypt($_GET["code"]);
     
     //rota
@@ -253,10 +331,10 @@ $app->get("/forgot/reset", function(){
 });
     
 $app->post("/forgot/reset", function(){
-    //verificando o código do email enviado pra recuperação de senha
+    //verificando o cï¿½digo do email enviado pra recuperaï¿½ï¿½o de senha
     $forgot = User::validForgotDecrypt($_POST["code"]);
     
-    //vai falar se esse processo de recuperação já foi usado e pra não recuperar de novo
+    //vai falar se esse processo de recuperaï¿½ï¿½o jï¿½ foi usado e pra nï¿½o recuperar de novo
     User::setForgotUsed($forgot["idrecovery"]);
     
     //agora vai realmente mudar a senha
@@ -266,7 +344,7 @@ $app->post("/forgot/reset", function(){
     
     //criptografando a senha http://php.net/manual/pt_BR/function.password-hash.php
     $password = password_hash($_POST["password"], PASSWORD_DEFAULT, [
-        "cost"=>8 //quantidade de processamento pra gerar a senha padrão é 12
+        "cost"=>8 //quantidade de processamento pra gerar a senha padrï¿½o ï¿½ 12
     ]);
     
     $user->setPassword($password); //vai salvar o hash dessa senha no banco
@@ -312,7 +390,7 @@ $app->post("/profile", function(){
     
     if($_POST['desemail'] !== $user->getdesemail()){
         if(User::checkLogin($_POST['desemail']) === true){
-            User::setError("Este endereço de e-mail já está cadastrado!");
+            User::setError("Este endereï¿½o de e-mail jï¿½ estï¿½ cadastrado!");
             
             header("Location: /profile");
             exit();

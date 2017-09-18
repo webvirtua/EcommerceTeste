@@ -26,8 +26,8 @@ class Address extends Model{
     
     public function loadFromCEP($nrcep){
         $data = Address::getCEP($nrcep);
-        
-        if(isset($data['logradouro']) && $data['logradouro']){
+
+        if(isset($data['localidade']) && $data['localidade']){
             $this->setdesaddress($data['logradouro']);
             $this->setdescomplement($data['complemento']);
             $this->setdesdistrict($data['bairro']);

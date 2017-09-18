@@ -29,9 +29,9 @@ class User extends Model{
 	        || !(int)$_SESSION[User::SESSION]["iduser"] > 0
 	    )
 	    {
-	        return false; //não esta logado
+	        return false; //nï¿½o esta logado
 	    }else{
-	        //chegando rota da administração
+	        //chegando rota da administraï¿½ï¿½o
 	        if($inadmin === true && (bool)$_SESSION[User::SESSION]['inadmin'] === true){
 	            return true;
 	        }else if($inadmin ===  false){
@@ -50,7 +50,7 @@ class User extends Model{
 		));
 
 		if(count($results) === 0){
-		    throw new \Exception("Usuário inexistente ou senha inválida."); //contra barra é pra achar a exception principal		
+		    throw new \Exception("Usuï¿½rio inexistente ou senha invï¿½lida."); //contra barra ï¿½ pra achar a exception principal		
 		}
 
 		$data = $results[0];
@@ -58,7 +58,7 @@ class User extends Model{
 		if(password_verify($password, $data["despassword"]) === true){
 			$user = new User();
 
-			//pegar dinâmicamente || cada resultado do banco vai criar uma atributo para cada campo
+			//pegar dinï¿½micamente || cada resultado do banco vai criar uma atributo para cada campo
 			$data['desperson'] = utf8_encode($data['desperson']);
 			
 			$user->setData($data);
@@ -68,13 +68,13 @@ class User extends Model{
 
 			return $user;
 		}else{
-			throw new \Exception("Usuário inexistente ou senha inválida.");
+			throw new \Exception("Usuï¿½rio inexistente ou senha invï¿½lida.");
 		}
 	}
 
-	//método que verifica se o usuário está logado ou não
+	//mï¿½todo que verifica se o usuï¿½rio estï¿½ logado ou nï¿½o
 	public static function verifyLogin($inadmin = true){
-		if(!User::checkLogin($inadmin)){ //se a sessão não for definida
+		if(!User::checkLogin($inadmin)){ //se a sessï¿½o nï¿½o for definida
 			if($inadmin){
 			    header("Location: /admin/login");
 			}else{
@@ -156,17 +156,17 @@ class User extends Model{
 	    ));
 	    
 	    if(count($results) === 0){
-	        throw new \Exception("Não foi possível recuperar a senha.");
+	        throw new \Exception("Nï¿½o foi possï¿½vel recuperar a senha.");
 	    }else{
 	        $data = $results[0];
 	        
 	        $results2 = $sql->select("CALL sp_userspasswordsrecoveries_create(:iduser, :desip)", array(
 	            ":iduser"=>$data["iduser"],
-	            ":desip"=>$_SERVER["REMOTE_ADDR"] //pega o ip do usuário
+	            ":desip"=>$_SERVER["REMOTE_ADDR"] //pega o ip do usuï¿½rio
 	        ));
 	        
 	        if(count($results2) === 0){
-	            throw new \Exception("Não foi possível recuperar a senha.");
+	            throw new \Exception("Nï¿½o foi possï¿½vel recuperar a senha.");
 	        }else{
 	            //PARTE DA CRIPTOGRAFIA DA SENHA
 	            $dataRecovery = $results2[0];
@@ -174,10 +174,10 @@ class User extends Model{
 	            $code = base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_128, User::SECRET, $dataRecovery["idrecovery"], MCRYPT_MODE_ECB));
 	            
 	            if($inadmin === true){
-	                //link, endereço que vai ser enviado o codigo e link do email parte administração
+	                //link, endereï¿½o que vai ser enviado o codigo e link do email parte administraï¿½ï¿½o
 	                $link = "http://www.hcodecommerce.com.br/admin/forgot/reset?code=$code";
 	            }else{
-	                //link, endereço que vai ser enviado o codigo e link do email parte dos clientes do site
+	                //link, endereï¿½o que vai ser enviado o codigo e link do email parte dos clientes do site
 	                $link = "http://www.hcodecommerce.com.br/forgot/reset?code=$code";
 	            }
 	            
@@ -192,7 +192,7 @@ class User extends Model{
 	        }
 	    }
 	}
-	//validação do código do email quando clica no link
+	//validaï¿½ï¿½o do cï¿½digo do email quando clica no link
 	public static function validForgotDecrypt($code){
 	    $idrecovery = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, User::SECRET, base64_decode($code), MCRYPT_MODE_ECB);
 	    
@@ -211,12 +211,12 @@ class User extends Model{
 	    ));
 	    
 	    if(count($results) === 0){
-	        throw new \Exception("Não foi possível recuperar a senha");
+	        throw new \Exception("Nï¿½o foi possï¿½vel recuperar a senha");
 	    }else{
 	        return $results[0];
 	    }
 	}
-	//método vai verificar se a recuperação de senha foi usada e não deixar usar de novo se já foi
+	//mï¿½todo vai verificar se a recuperaï¿½ï¿½o de senha foi usada e nï¿½o deixar usar de novo se jï¿½ foi
 	public static function setForgotUsed($idrecovery){
         $sql = new Sql();
         
@@ -281,7 +281,7 @@ class User extends Model{
 	public static function clearErrorRegister(){
 	    $_SESSION[User::ERROR_REGISTER] = NULL;
 	}
-	//verifica se o usuário já existe
+	//verifica se o usuï¿½rio jï¿½ existe
 	public static function checkLoginExist($login){
 	    $sql = new Sql();
 	    
@@ -297,5 +297,23 @@ class User extends Model{
 	        'cost'=>8
 	    ]);
 	}
+
+	public function getOrders(){
+        $sql = new Sql();
+
+        $results = $sql->select("
+          SELECT * FROM tb_orders a 
+          INNER JOIN tb_ordersstatus b USING(idstatus)
+          INNER JOIN tb_carts c USING(idcart)
+          INNER JOIN tb_users d ON d.iduser = a.iduser
+          INNER JOIN tb_addresses e USING(idaddress)
+          INNER JOIN tb_persons f ON f.idperson = d.idperson
+          WHERE a.iduser = :iduser 
+        ", [
+            ':iduser '=>$this->getiduser()
+        ]);
+
+        return $results;
+    }
 }
 ?>

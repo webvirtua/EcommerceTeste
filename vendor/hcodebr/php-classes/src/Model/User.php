@@ -310,7 +310,7 @@ class User extends Model{
           INNER JOIN tb_persons f ON f.idperson = d.idperson
           WHERE a.iduser = :iduser 
         ", [
-            ':iduser '=>$this->getiduser()
+            ':iduser'=>$this->getiduser()
         ]);
 
         return $results;

@@ -131,5 +131,51 @@ class Product extends Model{
             ':idproduct'=>$this->getidproduct()
         ]);
     }
+
+    //paginação
+    public static function getPage($page = 1, $itemsPerPage = 10){
+        $start = ($page - 1) * $itemsPerPage; //primeira pagina come�a no zero
+
+        $sql = new Sql();
+
+        $results = $sql->select("
+            SELECT SQL_CALC_FOUND_ROWS *
+            FROM tb_products 
+            ORDER BY desproduct
+            LIMIT $start, $itemsPerPage;
+        ");
+
+        $resultTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal;");
+
+        return [
+            'data'=>$results,
+            'total'=>(int)$resultTotal[0]["nrtotal"],
+            'pages'=>ceil($resultTotal[0]["nrtotal"] / $itemsPerPage) //conta quantas paginas tem resultados
+        ];
+    }
+
+    public static function getPageSearch($search, $page = 1, $itemsPerPage = 10){
+        $start = ($page - 1) * $itemsPerPage; //primeira pagina come�a no zero
+
+        $sql = new Sql();
+
+        $results = $sql->select("
+            SELECT SQL_CALC_FOUND_ROWS *
+            FROM tb_products             
+            WHERE desproduct LIKE :search
+            ORDER BY desproduct
+            LIMIT $start, $itemsPerPage;
+        ", [
+            ':search'=>'%'.$search.'%'
+        ]);
+
+        $resultTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal;");
+
+        return [
+            'data'=>$results,
+            'total'=>(int)$resultTotal[0]["nrtotal"],
+            'pages'=>ceil($resultTotal[0]["nrtotal"] / $itemsPerPage) //conta quantas paginas tem resultados
+        ];
+    }
 }
 ?>

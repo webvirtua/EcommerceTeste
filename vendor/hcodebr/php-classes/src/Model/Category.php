@@ -54,7 +54,7 @@
              array_push($html, '<li><a href="/categories/'.$row['idcategory'].'">'.$row['descategory'].'</a></li>');
          }
              
-         file_put_contents($_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR."views".DIRECTORY_SEPARATOR."categories-menu.html", implode('', $html)); //implode vai trandormar a variável $html que é array em string, e o explode é string pra array
+         file_put_contents($_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR."views".DIRECTORY_SEPARATOR."categories-menu.html", implode('', $html)); //implode vai trandormar a variï¿½vel $html que ï¿½ array em string, e o explode ï¿½ string pra array
      }
      
      public function getProducts($related = true){
@@ -78,9 +78,9 @@
              ]);
          }
      }
-     //paginação
+     //paginaï¿½ï¿½o
      public function getProductsPage($page = 1, $itemsPerPage = 3){
-         $start = ($page - 1) * $itemsPerPage; //primeira pagina começa no zero
+         $start = ($page - 1) * $itemsPerPage; //primeira pagina comeï¿½a no zero
          
          $sql = new Sql();
          
@@ -90,7 +90,7 @@
             INNER JOIN tb_productscategories b ON a.idproduct = b.idproduct 
             INNER JOIN tb_categories c ON c.idcategory = b.idcategory 
             WHERE c.idcategory = :idcategory 
-            LIMIT $start, $itemsPerPage; # usando 2 parametro no limit, primeiro a parte de que numero começa a contar, e depois quantos resultados exibirá
+            LIMIT $start, $itemsPerPage; # usando 2 parametro no limit, primeiro a parte de que numero comeï¿½a a contar, e depois quantos resultados exibirï¿½
          ", [
              ':idcategory'=>$this->getidcategory()
          ]);
@@ -120,6 +120,52 @@
              ':idcategory'=>$this->getidcategory(),
              ':idproduct'=>$product->getidproduct()
          ]);
+     }
+
+     //paginaÃ§Ã£o
+     public static function getPage($page = 1, $itemsPerPage = 10){
+         $start = ($page - 1) * $itemsPerPage; //primeira pagina comeï¿½a no zero
+
+         $sql = new Sql();
+
+         $results = $sql->select("
+            SELECT SQL_CALC_FOUND_ROWS *
+            FROM tb_categories 
+            ORDER BY descategory
+            LIMIT $start, $itemsPerPage;
+        ");
+
+         $resultTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal;");
+
+         return [
+             'data'=>$results,
+             'total'=>(int)$resultTotal[0]["nrtotal"],
+             'pages'=>ceil($resultTotal[0]["nrtotal"] / $itemsPerPage) //conta quantas paginas tem resultados
+         ];
+     }
+
+     public static function getPageSearch($search, $page = 1, $itemsPerPage = 10){
+         $start = ($page - 1) * $itemsPerPage; //primeira pagina comeï¿½a no zero
+
+         $sql = new Sql();
+
+         $results = $sql->select("
+            SELECT SQL_CALC_FOUND_ROWS *
+            FROM tb_categories             
+            WHERE descategory LIKE :search
+            ORDER BY descategory
+            LIMIT $start, $itemsPerPage;
+        ", [
+             ':search'=>'%'.$search.'%'
+         ]);
+
+         $resultTotal = $sql->select("SELECT FOUND_ROWS() AS nrtotal;");
+
+         return [
+             'data'=>$results,
+             'total'=>(int)$resultTotal[0]["nrtotal"],
+             'pages'=>ceil($resultTotal[0]["nrtotal"] / $itemsPerPage) //conta quantas paginas tem resultados
+         ];
      }
  }
  ?>
